@@ -1,0 +1,1604 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Data Mahasiswa</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ['Orbitron', 'sans-serif'],
+              body: ['Plus Jakarta Sans', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        --bg-primary: #060e1a;
+        --bg-secondary: #0a1628;
+        --bg-card: rgba(10, 22, 40, 0.7);
+        --border: rgba(0, 184, 240, 0.15);
+        --accent: #00b8f0;
+        --accent-glow: rgba(0, 184, 240, 0.3);
+        --accent-dim: #009ad4;
+        --text-primary: #eafbff;
+        --text-secondary: #8ee5ff;
+        --text-muted: rgba(142, 229, 255, 0.5);
+        --danger: #ff4d6a;
+        --success: #00e89d;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* === BACKGROUND === */
+      .bg-grid {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background-image: linear-gradient(rgba(0, 184, 240, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 184, 240, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        animation: gridMove 20s linear infinite;
+      }
+      @keyframes gridMove {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 40px 40px;
+        }
+      }
+
+      .bg-orbs {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .bg-orbs .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.12;
+        animation: orbFloat 12s ease-in-out infinite alternate;
+      }
+      .bg-orbs .orb:nth-child(1) {
+        width: 350px;
+        height: 350px;
+        background: #00b8f0;
+        top: -80px;
+        left: -60px;
+        animation-duration: 14s;
+      }
+      .bg-orbs .orb:nth-child(2) {
+        width: 280px;
+        height: 280px;
+        background: #00e89d;
+        bottom: -60px;
+        right: -40px;
+        animation-duration: 10s;
+        animation-delay: -3s;
+      }
+      .bg-orbs .orb:nth-child(3) {
+        width: 200px;
+        height: 200px;
+        background: #4dd2ff;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-duration: 16s;
+        animation-delay: -6s;
+      }
+      @keyframes orbFloat {
+        0% {
+          transform: translate(0, 0) scale(1);
+        }
+        100% {
+          transform: translate(30px, -40px) scale(1.15);
+        }
+      }
+
+      .scanline {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        opacity: 0.15;
+        z-index: 1;
+        animation: scanDown 6s linear infinite;
+      }
+      @keyframes scanDown {
+        0% {
+          top: -2px;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      /* === GLASS === */
+      .glass {
+        background: var(--bg-card);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+      }
+      .glass-glow {
+        box-shadow:
+          0 0 20px rgba(0, 184, 240, 0.05),
+          inset 0 1px 0 rgba(0, 184, 240, 0.08);
+      }
+
+      /* === INPUTS === */
+      .cyber-input {
+        width: 100%;
+        background: rgba(6, 14, 26, 0.6);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        color: var(--text-primary);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        outline: none;
+        -webkit-appearance: none;
+      }
+      .cyber-input:focus {
+        border-color: var(--accent);
+        box-shadow:
+          0 0 0 3px var(--accent-glow),
+          0 0 20px rgba(0, 184, 240, 0.1);
+      }
+      .cyber-input::placeholder {
+        color: var(--text-muted);
+      }
+
+      select.cyber-input {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300b8f0' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+      }
+      select.cyber-input option {
+        background: #0a1628;
+        color: #eafbff;
+      }
+      textarea.cyber-input {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .cyber-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 6px;
+        font-family: 'Orbitron', sans-serif;
+      }
+
+      /* === BUTTONS === */
+      .btn-cyber {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-cyber::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .btn-cyber:active::before {
+        opacity: 1;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #00b8f0, #009ad4);
+        color: #060e1a;
+        box-shadow: 0 4px 20px rgba(0, 184, 240, 0.3);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 6px 30px rgba(0, 184, 240, 0.45);
+        transform: translateY(-1px);
+      }
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+      }
+      .btn-ghost:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: rgba(0, 184, 240, 0.05);
+      }
+
+      .btn-danger {
+        background: rgba(255, 77, 106, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(255, 77, 106, 0.2);
+      }
+      .btn-danger:hover {
+        background: rgba(255, 77, 106, 0.2);
+        border-color: rgba(255, 77, 106, 0.4);
+      }
+
+      .btn-sm {
+        padding: 8px 14px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+
+      /* === BADGE === */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-family: 'Orbitron', sans-serif;
+      }
+      .badge-pemula {
+        background: rgba(0, 184, 240, 0.15);
+        color: #4dd2ff;
+      }
+      .badge-menengah {
+        background: rgba(0, 232, 157, 0.15);
+        color: #00e89d;
+      }
+      .badge-mahir {
+        background: rgba(255, 183, 0, 0.15);
+        color: #ffb700;
+      }
+      .badge-fasih {
+        background: rgba(178, 100, 255, 0.15);
+        color: #b264ff;
+      }
+      .badge-native {
+        background: rgba(255, 77, 106, 0.15);
+        color: #ff4d6a;
+      }
+
+      /* === DATA CARD === */
+      .data-card {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .data-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--accent), transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .data-card:hover::before,
+      .data-card:active::before {
+        opacity: 1;
+      }
+      .data-card:hover,
+      .data-card:active {
+        border-color: rgba(0, 184, 240, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 184, 240, 0.08);
+      }
+
+      /* === MODAL OVERLAY === */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(6, 14, 26, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 100;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        width: 100%;
+        max-width: 560px;
+        max-height: 92vh;
+        overflow-y: auto;
+        border-radius: 20px 20px 0 0;
+        transform: translateY(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .modal-overlay.active .modal-content {
+        transform: translateY(0);
+      }
+
+      /* === CENTER MODAL (password) === */
+      .modal-center {
+        align-items: center;
+      }
+      .modal-center .modal-content {
+        border-radius: 20px;
+        transform: scale(0.9);
+        margin: 20px;
+      }
+      .modal-center.active .modal-content {
+        transform: scale(1);
+      }
+
+      /* === TOAST === */
+      .toast-container {
+        position: fixed;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: calc(100% - 32px);
+        max-width: 420px;
+        pointer-events: none;
+      }
+      .toast {
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        pointer-events: auto;
+        animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      .toast-success {
+        background: rgba(0, 232, 157, 0.15);
+        border: 1px solid rgba(0, 232, 157, 0.3);
+        color: #00e89d;
+      }
+      .toast-error {
+        background: rgba(255, 77, 106, 0.15);
+        border: 1px solid rgba(255, 77, 106, 0.3);
+        color: #ff4d6a;
+      }
+      .toast-exit {
+        animation: toastOut 0.3s ease forwards;
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      @keyframes toastOut {
+        from {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+      }
+
+      /* === CONFIRM === */
+      .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(6, 14, 26, 0.9);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 150;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        padding: 20px;
+      }
+      .confirm-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .confirm-box {
+        width: 100%;
+        max-width: 340px;
+        transform: scale(0.9);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .confirm-overlay.active .confirm-box {
+        transform: scale(1);
+      }
+
+      /* === SPINNER === */
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* === SEARCH === */
+      .search-wrapper {
+        position: relative;
+      }
+      .search-wrapper .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+      }
+      .search-wrapper .cyber-input {
+        padding-left: 42px;
+      }
+
+      /* === DETAIL === */
+      .detail-row {
+        display: flex;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(0, 184, 240, 0.06);
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-label {
+        width: 110px;
+        flex-shrink: 0;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: 'Orbitron', sans-serif;
+        padding-top: 2px;
+      }
+      .detail-value {
+        flex: 1;
+        font-size: 15px;
+        color: var(--text-primary);
+        line-height: 1.6;
+        word-break: break-word;
+      }
+
+      .glow-text {
+        text-shadow: 0 0 30px rgba(0, 184, 240, 0.3);
+      }
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--success);
+        border-radius: 50%;
+        position: relative;
+      }
+      .pulse-dot::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: var(--success);
+        opacity: 0.3;
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.3;
+        }
+        50% {
+          transform: scale(1.8);
+          opacity: 0;
+        }
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 12px 8px;
+      }
+      .stat-number {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+      .stat-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-family: 'Orbitron', sans-serif;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-up {
+        animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      /* === VIEW TRANSITIONS === */
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      /* === FORM SUBMITTED ANIMATION === */
+      .success-ring {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid var(--success);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: ringPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes ringPop {
+        from {
+          transform: scale(0);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* === PASSWORD FIELD === */
+      .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 4px;
+        display: flex;
+        align-items: center;
+      }
+      .password-toggle:hover {
+        color: var(--accent);
+      }
+
+      /* === SCROLLBAR === */
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 184, 240, 0.2);
+        border-radius: 4px;
+      }
+
+      @media (max-width: 380px) {
+        .stat-number {
+          font-size: 18px;
+        }
+        .btn-cyber {
+          padding: 10px 16px;
+          font-size: 14px;
+        }
+        .cyber-input {
+          padding: 10px 12px;
+          font-size: 14px;
+        }
+      }
+      @media (min-width: 640px) {
+        .modal-content {
+          border-radius: 20px;
+          margin-bottom: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-orbs">
+      <div class="orb"></div>
+      <div class="orb"></div>
+      <div class="orb"></div>
+    </div>
+    <div class="scanline"></div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Confirm Dialog -->
+    <div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-label="Konfirmasi hapus">
+      <div class="confirm-box glass glass-glow p-6 text-center">
+        <div class="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: rgba(255, 77, 106, 0.1); border: 1px solid rgba(255, 77, 106, 0.2)">
+          <i data-lucide="alert-triangle" style="width: 28px; height: 28px; color: var(--danger)"></i>
+        </div>
+        <h3 class="text-lg font-bold mb-2">Hapus Data?</h3>
+        <p class="text-sm mb-6" style="color: var(--text-muted)">Data yang dihapus tidak dapat dikembalikan.</p>
+        <div class="flex gap-3">
+          <button class="btn-cyber btn-ghost flex-1" onclick="closeConfirm()">Batal</button>
+          <button class="btn-cyber btn-danger flex-1" id="confirmDeleteBtn">Ya, Hapus</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="modal-overlay modal-center" id="passwordModal" role="dialog" aria-modal="true" aria-label="Masuk panel admin">
+      <div class="modal-content glass glass-glow p-6">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center" style="background: linear-gradient(135deg, rgba(0, 184, 240, 0.15), rgba(0, 184, 240, 0.05)); border: 1px solid var(--border)">
+            <i data-lucide="lock" style="width: 30px; height: 30px; color: var(--accent)"></i>
+          </div>
+          <h2 class="font-display text-lg font-bold">Akses Terbatas</h2>
+          <p class="text-sm mt-1" style="color: var(--text-muted)">Masukkan password untuk membuka panel data</p>
+        </div>
+        <form id="passwordForm" novalidate>
+          <div class="relative mb-2">
+            <input type="password" id="passwordInput" class="cyber-input" placeholder="Masukkan password" autocomplete="off" autofocus />
+            <button type="button" class="password-toggle" id="togglePassword" aria-label="Tampilkan password">
+              <i data-lucide="eye" style="width: 18px; height: 18px"></i>
+            </button>
+          </div>
+          <p class="text-xs mb-5" style="color: var(--danger); display: none" id="passwordError">Password salah. Coba lagi.</p>
+          <div class="flex gap-3">
+            <button type="button" class="btn-cyber btn-ghost flex-1" onclick="closePasswordModal()">Batal</button>
+            <button type="submit" class="btn-cyber btn-primary flex-1">
+              <i data-lucide="unlock" style="width: 18px; height: 18px"></i>
+              Masuk
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="detailModal" role="dialog" aria-modal="true" aria-label="Detail mahasiswa">
+      <div class="modal-content glass glass-glow p-6" id="detailContent"></div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-label="Edit mahasiswa">
+      <div class="modal-content glass glass-glow">
+        <div class="p-6 pb-0">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="font-display text-lg font-bold">Edit Data</h2>
+              <p class="text-xs mt-1" style="color: var(--text-muted)">Perbarui informasi mahasiswa</p>
+            </div>
+            <button class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: rgba(0, 184, 240, 0.06); border: 1px solid var(--border)" onclick="closeEditModal()" aria-label="Tutup">
+              <i data-lucide="x" style="width: 18px; height: 18px; color: var(--text-muted)"></i>
+            </button>
+          </div>
+        </div>
+        <div class="px-6 pb-6">
+          <form id="editForm" novalidate>
+            <input type="hidden" id="editRow" />
+            <div class="space-y-4">
+              <div><label class="cyber-label" for="editNama">Nama Lengkap</label><input type="text" id="editNama" class="cyber-input" required /></div>
+              <div><label class="cyber-label" for="editNIM">NIM</label><input type="text" id="editNIM" class="cyber-input" required /></div>
+              <div><label class="cyber-label" for="editEmail">Email</label><input type="email" id="editEmail" class="cyber-input" required /></div>
+              <div><label class="cyber-label" for="editDomisili">Domisili</label><input type="text" id="editDomisili" class="cyber-input" required /></div>
+              <div>
+                <label class="cyber-label" for="editLevel">Level Bahasa</label>
+                <select id="editLevel" class="cyber-input" required>
+                  <option value="">Pilih level bahasa</option>
+                  <option value="Pemula">Pemula</option>
+                  <option value="Menengah">Menengah</option>
+                  <option value="Mahir">Mahir</option>
+                  <option value="Fasih">Fasih</option>
+                  <option value="Native">Native</option>
+                </select>
+              </div>
+              <div><label class="cyber-label" for="editKeterangan">Keterangan</label><textarea id="editKeterangan" class="cyber-input" rows="3"></textarea></div>
+            </div>
+            <div class="flex gap-3 mt-6">
+              <button type="button" class="btn-cyber btn-ghost flex-1" onclick="closeEditModal()">Batal</button>
+              <button type="submit" class="btn-cyber btn-primary flex-1" id="editSubmitBtn">
+                <i data-lucide="check" style="width: 18px; height: 18px"></i>
+                Perbarui
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- VIEW 1: FORM TAMBAH DATA (HALAMAN UTAMA)    -->
+    <!-- ============================================ -->
+    <div class="view active relative z-10" id="viewForm">
+      <!-- Header -->
+      <header class="px-5 pt-6 pb-2">
+        <div class="max-w-lg mx-auto">
+          <div class="flex items-center gap-3 mb-1">
+            <div class="pulse-dot"></div>
+            <span class="text-xs font-display font-semibold tracking-widest" style="color: var(--text-muted)">DATABASE AKTIF</span>
+          </div>
+          <h1 class="font-display text-2xl sm:text-3xl font-900 glow-text tracking-tight">Data Mahasiswa</h1>
+          <p class="text-sm mt-1" style="color: var(--text-muted)">Isi formulir untuk mendaftarkan data mahasiswa baru</p>
+        </div>
+      </header>
+
+      <!-- Form Area -->
+      <main class="flex-1 px-5 py-6 flex items-start justify-center">
+        <div class="w-full max-w-lg">
+          <!-- Form Card -->
+          <div class="glass glass-glow p-5 sm:p-6" id="formCard">
+            <form id="addForm" novalidate>
+              <div class="space-y-4">
+                <div>
+                  <label class="cyber-label" for="addNama">Nama Lengkap</label>
+                  <input type="text" id="addNama" class="cyber-input" placeholder="Masukkan nama lengkap" required autocomplete="name" />
+                </div>
+                <div>
+                  <label class="cyber-label" for="addNIM">NIM</label>
+                  <input type="text" id="addNIM" class="cyber-input" placeholder="Nomor Induk Mahasiswa" required />
+                </div>
+                <div>
+                  <label class="cyber-label" for="addEmail">Email</label>
+                  <input type="email" id="addEmail" class="cyber-input" placeholder="contoh@universitas.ac.id" required autocomplete="email" />
+                </div>
+                <div>
+                  <label class="cyber-label" for="addDomisili">Domisili</label>
+                  <input type="text" id="addDomisili" class="cyber-input" placeholder="Kota / Kabupaten" required />
+                </div>
+                <div>
+                  <label class="cyber-label" for="addLevel">Level Bahasa</label>
+                  <select id="addLevel" class="cyber-input" required>
+                    <option value="">Pilih level bahasa</option>
+                    <option value="Pemula">Pemula</option>
+                    <option value="Menengah">Menengah</option>
+                    <option value="Mahir">Mahir</option>
+                    <option value="Fasih">Fasih</option>
+                    <option value="Native">Native</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="cyber-label" for="addKeterangan">Keterangan</label>
+                  <textarea id="addKeterangan" class="cyber-input" placeholder="Tuliskan keterangan tambahan..." rows="3"></textarea>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-cyber btn-primary w-full mt-6" id="addSubmitBtn">
+                <i data-lucide="send" style="width: 18px; height: 18px"></i>
+                Kirim Data
+              </button>
+            </form>
+          </div>
+
+          <!-- Success State (hidden by default) -->
+          <div class="glass glass-glow p-8 text-center hidden" id="successCard">
+            <div class="success-ring mx-auto mb-5">
+              <i data-lucide="check" style="width: 36px; height: 36px; color: var(--success)"></i>
+            </div>
+            <h3 class="font-display text-lg font-bold mb-2">Data Terkirim</h3>
+            <p class="text-sm mb-6" style="color: var(--text-muted)">Data mahasiswa berhasil disimpan ke database</p>
+            <button class="btn-cyber btn-primary" onclick="resetAddForm()">
+              <i data-lucide="plus" style="width: 18px; height: 18px"></i>
+              Tambah Data Lagi
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer with Admin Link -->
+      <footer class="px-5 pb-6">
+        <div class="max-w-lg mx-auto text-center">
+          <button
+            class="text-xs flex items-center justify-center gap-1.5 mx-auto py-2 px-4 rounded-lg transition-all duration-300 hover:bg-white/[0.03]"
+            style="color: var(--text-muted)"
+            onclick="openPasswordModal()"
+            aria-label="Buka panel admin"
+          >
+            <i data-lucide="shield" style="width: 13px; height: 13px"></i>
+            Panel Admin
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- VIEW 2: PANEL DATA (TERSEMBUNYI, PASSWORD)   -->
+    <!-- ============================================ -->
+    <div class="view relative z-10" id="viewData">
+      <!-- Header -->
+      <header class="px-5 pt-6 pb-2">
+        <div class="max-w-lg mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <div class="pulse-dot"></div>
+                <span class="text-xs font-display font-semibold tracking-widest" style="color: var(--text-muted)">ADMIN PANEL</span>
+              </div>
+              <h1 class="font-display text-xl sm:text-2xl font-900 glow-text tracking-tight">Data Mahasiswa</h1>
+            </div>
+            <button class="btn-cyber btn-ghost btn-sm" onclick="lockPanel()" aria-label="Kunci panel">
+              <i data-lucide="lock" style="width: 16px; height: 16px"></i>
+              <span class="hidden sm:inline">Kunci</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Stats -->
+      <section class="px-5 mb-4 mt-3" aria-label="Statistik">
+        <div class="max-w-lg mx-auto glass glass-glow">
+          <div class="grid grid-cols-3 divide-x" style="border-color: var(--border)">
+            <div class="stat-item" style="border-color: var(--border)">
+              <div class="stat-number" id="statTotal">0</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-item" style="border-color: var(--border)">
+              <div class="stat-number" id="statLevels">0</div>
+              <div class="stat-label">Level</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="statCities">0</div>
+              <div class="stat-label">Kota</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search -->
+      <section class="px-5 mb-4">
+        <div class="max-w-lg mx-auto search-wrapper">
+          <i data-lucide="search" class="search-icon" style="width: 18px; height: 18px"></i>
+          <input type="text" class="cyber-input" id="searchInput" placeholder="Cari nama, NIM, kota..." aria-label="Cari data" />
+        </div>
+      </section>
+
+      <!-- Data List -->
+      <main class="px-5 pb-28 flex-1">
+        <div class="max-w-lg mx-auto">
+          <div id="loadingState" class="flex flex-col items-center justify-center py-20">
+            <div class="spinner mb-4"></div>
+            <p class="text-sm" style="color: var(--text-muted)">Memuat data dari server...</p>
+          </div>
+
+          <div id="emptyState" class="text-center py-20 hidden">
+            <div class="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center" style="background: rgba(0, 184, 240, 0.06); border: 1px dashed rgba(0, 184, 240, 0.2); color: var(--text-muted)">
+              <i data-lucide="database" style="width: 36px; height: 36px"></i>
+            </div>
+            <h3 class="font-display text-base font-bold mb-2" style="color: var(--text-secondary)">Belum Ada Data</h3>
+            <p class="text-sm" style="color: var(--text-muted)">Data yang ditambahkan akan tampil di sini</p>
+          </div>
+
+          <div id="noResultsState" class="text-center py-20 hidden">
+            <div class="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center" style="background: rgba(0, 184, 240, 0.06); border: 1px dashed rgba(0, 184, 240, 0.2); color: var(--text-muted)">
+              <i data-lucide="search-x" style="width: 36px; height: 36px"></i>
+            </div>
+            <h3 class="font-display text-base font-bold mb-2" style="color: var(--text-secondary)">Tidak Ditemukan</h3>
+            <p class="text-sm" style="color: var(--text-muted)">Coba gunakan kata kunci lain</p>
+          </div>
+
+          <div id="dataContainer" class="space-y-3 hidden"></div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // ============================================================
+      // KONFIGURASI — GANTI DENGAN URL GOOGLE APPS SCRIPT ANDA
+      // ============================================================
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyz2OQ0ECdVR9XZGWtkHcNR1gyognfKGEy7gpRos1ldNbzFr1g2s_WYOZ1ag3xj8uUwYQ/exec';
+
+      // ============================================================
+      // PASSWORD — GANTI PASSWORD SESUAI KEINGINAN ANDA
+      // ============================================================
+      const ADMIN_PASSWORD = 'admin123';
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      let allData = [];
+      let deleteTarget = null;
+      let isAdminUnlocked = false;
+
+      // ============================================================
+      // INISIALISASI
+      // ============================================================
+      document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+
+        // Form tambah data
+        document.getElementById('addForm').addEventListener('submit', handleAddSubmit);
+
+        // Form edit data
+        document.getElementById('editForm').addEventListener('submit', handleEditSubmit);
+
+        // Form password
+        document.getElementById('passwordForm').addEventListener('submit', handlePasswordSubmit);
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', togglePasswordVisibility);
+
+        // Debounced search
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => renderData(e.target.value.trim()), 200);
+        });
+
+        // Tutup modal klik overlay
+        document.getElementById('passwordModal').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) closePasswordModal();
+        });
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) closeDetail();
+        });
+        document.getElementById('editModal').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) closeEditModal();
+        });
+        document.getElementById('confirmOverlay').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) closeConfirm();
+        });
+
+        // Konfirmasi hapus
+        document.getElementById('confirmDeleteBtn').addEventListener('click', executeDelete);
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            closePasswordModal();
+            closeDetail();
+            closeEditModal();
+            closeConfirm();
+          }
+        });
+      });
+
+      // ============================================================
+      // VIEW SWITCHING
+      // ============================================================
+      function switchView(viewId) {
+        document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        window.scrollTo(0, 0);
+      }
+
+      // ============================================================
+      // PASSWORD
+      // ============================================================
+      function openPasswordModal() {
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordError').style.display = 'none';
+        openModal('passwordModal', false);
+        setTimeout(() => document.getElementById('passwordInput').focus(), 350);
+      }
+
+      function closePasswordModal() {
+        document.getElementById('passwordModal').classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      function handlePasswordSubmit(e) {
+        e.preventDefault();
+        const input = document.getElementById('passwordInput').value;
+
+        if (input === ADMIN_PASSWORD) {
+          isAdminUnlocked = true;
+          closePasswordModal();
+          switchView('viewData');
+          showToast('Akses diberikan', 'success');
+          fetchData();
+        } else {
+          document.getElementById('passwordError').style.display = 'block';
+          document.getElementById('passwordInput').value = '';
+          document.getElementById('passwordInput').focus();
+
+          // Shake animation
+          const modal = document.querySelector('#passwordModal .modal-content');
+          modal.style.animation = 'none';
+          modal.offsetHeight; // reflow
+          modal.style.animation = 'shake 0.4s ease';
+        }
+      }
+
+      function togglePasswordVisibility() {
+        const input = document.getElementById('passwordInput');
+        const icon = document.querySelector('#togglePassword i');
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+          input.type = 'password';
+          icon.setAttribute('data-lucide', 'eye');
+        }
+        lucide.createIcons();
+      }
+
+      function lockPanel() {
+        isAdminUnlocked = false;
+        switchView('viewForm');
+        showToast('Panel terkunci', 'success');
+      }
+
+      // Shake animation (injected once)
+      const shakeStyle = document.createElement('style');
+      shakeStyle.textContent = `
+      @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20% { transform: translateX(-10px); }
+        40% { transform: translateX(10px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+      }
+    `;
+      document.head.appendChild(shakeStyle);
+
+      // ============================================================
+      // TAMBAH DATA
+      // ============================================================
+      async function handleAddSubmit(e) {
+        e.preventDefault();
+
+        const nama = document.getElementById('addNama').value.trim();
+        const nim = document.getElementById('addNIM').value.trim();
+        const email = document.getElementById('addEmail').value.trim();
+        const domisili = document.getElementById('addDomisili').value.trim();
+        const level = document.getElementById('addLevel').value;
+        const keterangan = document.getElementById('addKeterangan').value.trim();
+
+        if (!nama) {
+          showToast('Nama wajib diisi', 'error');
+          return;
+        }
+        if (!nim) {
+          showToast('NIM wajib diisi', 'error');
+          return;
+        }
+        if (!email) {
+          showToast('Email wajib diisi', 'error');
+          return;
+        }
+        if (!isValidEmail(email)) {
+          showToast('Format email tidak valid', 'error');
+          return;
+        }
+        if (!domisili) {
+          showToast('Domisili wajib diisi', 'error');
+          return;
+        }
+        if (!level) {
+          showToast('Level bahasa wajib dipilih', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('addSubmitBtn');
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px"></div> Mengirim...';
+
+        try {
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'insert',
+              Nama: nama,
+              NIM: nim,
+              Email: email,
+              Domisili: domisili,
+              'Level Bahasa': level,
+              Keterangan: keterangan,
+            }),
+          });
+          const json = await res.json();
+
+          if (json.success) {
+            showToast('Data berhasil dikirim', 'success');
+            // Tampilkan success card
+            document.getElementById('formCard').classList.add('hidden');
+            document.getElementById('successCard').classList.remove('hidden');
+            lucide.createIcons();
+          } else {
+            showToast(json.message || 'Gagal menyimpan data', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Gagal terhubung ke server', 'error');
+        }
+
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.innerHTML = '<i data-lucide="send" style="width:18px;height:18px"></i> Kirim Data';
+        lucide.createIcons();
+      }
+
+      function resetAddForm() {
+        document.getElementById('addForm').reset();
+        document.getElementById('formCard').classList.remove('hidden');
+        document.getElementById('successCard').classList.add('hidden');
+        setTimeout(() => document.getElementById('addNama').focus(), 300);
+      }
+
+      // ============================================================
+      // FETCH DATA (ADMIN PANEL)
+      // ============================================================
+      async function fetchData() {
+        showLoading(true);
+        try {
+          const res = await fetch(SCRIPT_URL);
+          const json = await res.json();
+
+          if (json.success) {
+            allData = json.data || [];
+            renderData();
+            updateStats();
+          } else {
+            showToast(json.message || 'Gagal memuat data', 'error');
+            showEmpty();
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Gagal terhubung ke server', 'error');
+          showEmpty();
+        }
+        showLoading(false);
+      }
+
+      // ============================================================
+      // RENDER DATA
+      // ============================================================
+      function renderData(query = '') {
+        const container = document.getElementById('dataContainer');
+        const emptyState = document.getElementById('emptyState');
+        const noResults = document.getElementById('noResultsState');
+
+        let filtered = allData;
+        if (query) {
+          const q = query.toLowerCase();
+          filtered = allData.filter((d) => (d.Nama || '').toLowerCase().includes(q) || (d.NIM || '').toLowerCase().includes(q) || (d.Domisili || '').toLowerCase().includes(q) || (d.Email || '').toLowerCase().includes(q));
+        }
+
+        if (allData.length === 0) {
+          container.classList.add('hidden');
+          noResults.classList.add('hidden');
+          emptyState.classList.remove('hidden');
+          return;
+        }
+
+        if (filtered.length === 0) {
+          container.classList.add('hidden');
+          emptyState.classList.add('hidden');
+          noResults.classList.remove('hidden');
+          return;
+        }
+
+        emptyState.classList.add('hidden');
+        noResults.classList.add('hidden');
+        container.classList.remove('hidden');
+
+        container.innerHTML = filtered
+          .map((d, idx) => {
+            const levelClass = getBadgeClass(d['Level Bahasa']);
+            const initials = getInitials(d.Nama);
+            return `
+          <div class="data-card glass glass-glow p-4 fade-up" style="animation-delay:${idx * 50}ms" onclick="showDetail(${d._row})">
+            <div class="flex items-start gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 font-display font-bold text-sm"
+                style="background:linear-gradient(135deg,rgba(0,184,240,0.2),rgba(0,232,157,0.1));border:1px solid var(--border);color:var(--accent)">
+                ${initials}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between gap-2">
+                  <h3 class="font-semibold text-sm truncate">${escapeHtml(d.Nama || '-')}</h3>
+                  <span class="badge ${levelClass} flex-shrink-0">${escapeHtml(d['Level Bahasa'] || '-')}</span>
+                </div>
+                <p class="text-xs mt-0.5 truncate" style="color:var(--text-muted)">NIM: ${escapeHtml(d.NIM || '-')}</p>
+                <div class="flex items-center gap-3 mt-2">
+                  <span class="flex items-center gap-1 text-xs" style="color:var(--text-secondary)">
+                    <i data-lucide="map-pin" style="width:12px;height:12px"></i>
+                    ${escapeHtml(d.Domisili || '-')}
+                  </span>
+                  <span class="flex items-center gap-1 text-xs truncate" style="color:var(--text-secondary)">
+                    <i data-lucide="mail" style="width:12px;height:12px"></i>
+                    ${escapeHtml(d.Email || '-')}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-2 mt-3 pt-3" style="border-top:1px solid var(--border)" onclick="event.stopPropagation()">
+              <button class="btn-cyber btn-ghost btn-sm flex-1" onclick="openEditForm(${d._row})" aria-label="Edit">
+                <i data-lucide="pencil" style="width:14px;height:14px"></i> Edit
+              </button>
+              <button class="btn-cyber btn-danger btn-sm flex-1" onclick="confirmDelete(${d._row})" aria-label="Hapus">
+                <i data-lucide="trash-2" style="width:14px;height:14px"></i> Hapus
+              </button>
+            </div>
+          </div>
+        `;
+          })
+          .join('');
+
+        lucide.createIcons();
+      }
+
+      // ============================================================
+      // STATISTIK
+      // ============================================================
+      function updateStats() {
+        const total = allData.length;
+        const levels = new Set(allData.map((d) => d['Level Bahasa']).filter(Boolean)).size;
+        const cities = new Set(allData.map((d) => d.Domisili).filter(Boolean)).size;
+        animateCounter('statTotal', total);
+        animateCounter('statLevels', levels);
+        animateCounter('statCities', cities);
+      }
+
+      function animateCounter(id, target) {
+        const el = document.getElementById(id);
+        const start = parseInt(el.textContent) || 0;
+        const duration = 600;
+        const startTime = performance.now();
+        function tick(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.round(start + (target - start) * eased);
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      // ============================================================
+      // EDIT
+      // ============================================================
+      function openEditForm(row) {
+        const item = allData.find((d) => d._row === row);
+        if (!item) return;
+        document.getElementById('editRow').value = row;
+        document.getElementById('editNama').value = item.Nama || '';
+        document.getElementById('editNIM').value = item.NIM || '';
+        document.getElementById('editEmail').value = item.Email || '';
+        document.getElementById('editDomisili').value = item.Domisili || '';
+        document.getElementById('editLevel').value = item['Level Bahasa'] || '';
+        document.getElementById('editKeterangan').value = item.Keterangan || '';
+        openModal('editModal');
+        setTimeout(() => document.getElementById('editNama').focus(), 400);
+      }
+
+      function closeEditModal() {
+        document.getElementById('editModal').classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      async function handleEditSubmit(e) {
+        e.preventDefault();
+
+        const nama = document.getElementById('editNama').value.trim();
+        const nim = document.getElementById('editNIM').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        const domisili = document.getElementById('editDomisili').value.trim();
+        const level = document.getElementById('editLevel').value;
+        const keterangan = document.getElementById('editKeterangan').value.trim();
+        const row = document.getElementById('editRow').value;
+
+        if (!nama) {
+          showToast('Nama wajib diisi', 'error');
+          return;
+        }
+        if (!nim) {
+          showToast('NIM wajib diisi', 'error');
+          return;
+        }
+        if (!email) {
+          showToast('Email wajib diisi', 'error');
+          return;
+        }
+        if (!isValidEmail(email)) {
+          showToast('Format email tidak valid', 'error');
+          return;
+        }
+        if (!domisili) {
+          showToast('Domisili wajib diisi', 'error');
+          return;
+        }
+        if (!level) {
+          showToast('Level bahasa wajib dipilih', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('editSubmitBtn');
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+
+        try {
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: 'update',
+              _row: row,
+              Nama: nama,
+              NIM: nim,
+              Email: email,
+              Domisili: domisili,
+              'Level Bahasa': level,
+              Keterangan: keterangan,
+            }),
+          });
+          const json = await res.json();
+          if (json.success) {
+            showToast('Data berhasil diperbarui', 'success');
+            closeEditModal();
+            await fetchData();
+          } else {
+            showToast(json.message || 'Gagal memperbarui', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Gagal terhubung ke server', 'error');
+        }
+
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+
+      // ============================================================
+      // DELETE
+      // ============================================================
+      function confirmDelete(row) {
+        deleteTarget = row;
+        openModal('confirmOverlay', false);
+      }
+
+      async function executeDelete() {
+        if (!deleteTarget) return;
+        const btn = document.getElementById('confirmDeleteBtn');
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+
+        try {
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'delete', _row: deleteTarget }),
+          });
+          const json = await res.json();
+          if (json.success) {
+            showToast('Data berhasil dihapus', 'success');
+            closeConfirm();
+            await fetchData();
+          } else {
+            showToast(json.message || 'Gagal menghapus', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Gagal terhubung ke server', 'error');
+        }
+
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        deleteTarget = null;
+      }
+
+      // ============================================================
+      // DETAIL
+      // ============================================================
+      function showDetail(row) {
+        const item = allData.find((d) => d._row === row);
+        if (!item) return;
+        const levelClass = getBadgeClass(item['Level Bahasa']);
+        const content = document.getElementById('detailContent');
+
+        content.innerHTML = `
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="font-display text-lg font-bold">Detail Mahasiswa</h2>
+          <button class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:rgba(0,184,240,0.06);border:1px solid var(--border)" onclick="closeDetail()" aria-label="Tutup">
+            <i data-lucide="x" style="width:18px;height:18px;color:var(--text-muted)"></i>
+          </button>
+        </div>
+        <div class="flex items-center gap-4 mb-6 p-4 rounded-xl" style="background:rgba(0,184,240,0.04);border:1px solid var(--border)">
+          <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 font-display font-bold text-lg"
+            style="background:linear-gradient(135deg,rgba(0,184,240,0.25),rgba(0,232,157,0.15));border:1px solid rgba(0,184,240,0.2);color:var(--accent)">
+            ${getInitials(item.Nama)}
+          </div>
+          <div>
+            <h3 class="font-bold text-base">${escapeHtml(item.Nama || '-')}</h3>
+            <p class="text-xs mt-0.5" style="color:var(--text-muted)">NIM: ${escapeHtml(item.NIM || '-')}</p>
+          </div>
+        </div>
+        <div>
+          <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${escapeHtml(item.Email || '-')}</div></div>
+          <div class="detail-row"><div class="detail-label">Domisili</div><div class="detail-value">${escapeHtml(item.Domisili || '-')}</div></div>
+          <div class="detail-row"><div class="detail-label">Level</div><div class="detail-value"><span class="badge ${levelClass}">${escapeHtml(item['Level Bahasa'] || '-')}</span></div></div>
+          <div class="detail-row"><div class="detail-label">Keterangan</div><div class="detail-value">${escapeHtml(item.Keterangan || 'Tidak ada keterangan')}</div></div>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button class="btn-cyber btn-ghost flex-1" onclick="closeDetail();openEditForm(${item._row})">
+            <i data-lucide="pencil" style="width:16px;height:16px"></i> Edit
+          </button>
+          <button class="btn-cyber btn-danger flex-1" onclick="closeDetail();confirmDelete(${item._row})">
+            <i data-lucide="trash-2" style="width:16px;height:16px"></i> Hapus
+          </button>
+        </div>
+      `;
+
+        openModal('detailModal');
+        lucide.createIcons();
+      }
+
+      function closeDetail() {
+        document.getElementById('detailModal').classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      // ============================================================
+      // MODAL HELPERS
+      // ============================================================
+      function openModal(id, slide = true) {
+        document.getElementById(id).classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeConfirm() {
+        document.getElementById('confirmOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+        deleteTarget = null;
+      }
+
+      // ============================================================
+      // UI HELPERS
+      // ============================================================
+      function showLoading(show) {
+        const el = document.getElementById('loadingState');
+        if (show) {
+          el.style.display = 'flex';
+          document.getElementById('dataContainer').classList.add('hidden');
+          document.getElementById('emptyState').classList.add('hidden');
+          document.getElementById('noResultsState').classList.add('hidden');
+        } else {
+          el.style.display = 'none';
+        }
+      }
+
+      function showEmpty() {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('dataContainer').classList.add('hidden');
+        document.getElementById('noResultsState').classList.add('hidden');
+        document.getElementById('emptyState').classList.remove('hidden');
+        document.getElementById('statTotal').textContent = '0';
+        document.getElementById('statLevels').textContent = '0';
+        document.getElementById('statCities').textContent = '0';
+      }
+
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
+        toast.innerHTML = `<i data-lucide="${iconName}" style="width:18px;height:18px;flex-shrink:0"></i><span>${escapeHtml(message)}</span>`;
+        container.appendChild(toast);
+        lucide.createIcons();
+        setTimeout(() => {
+          toast.classList.add('toast-exit');
+          setTimeout(() => toast.remove(), 300);
+        }, 3500);
+      }
+
+      function getBadgeClass(level) {
+        const map = { Pemula: 'badge-pemula', Menengah: 'badge-menengah', Mahir: 'badge-mahir', Fasih: 'badge-fasih', Native: 'badge-native' };
+        return map[level] || 'badge-pemula';
+      }
+
+      function getInitials(name) {
+        if (!name) return '?';
+        const parts = name.trim().split(/\s+/);
+        return parts.length >= 2 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : parts[0][0].toUpperCase();
+      }
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+    </script>
+  </body>
+</html>
